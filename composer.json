@@ -1,0 +1,16 @@
+{
+    "name": "f3desha/code_samples",
+    "description": "Demos of code",
+    "authors": [
+        {
+            "name": "Alexander Kuzmenko",
+            "email": "f3dstudiya@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+      "psr-4": {
+        "HashCompareSystem\\": "projects/hash-compare-system"
+      }
+    }
+}
