@@ -3,23 +3,26 @@ namespace HashCompareSystem\Engine;
 
 class HashWorker {
 	
-	const ROOT_PATH_RELATIVELY_TO_WORKER = '../hash-compare-system';
-	const CACHE_FILE_LOCATION_RELATIVELY_TO_ROOT = '/cache/hashes_etalon.txt';
+	const ROOT_PATH_RELATIVELY_TO_WORKER = '../../../hash-compare-system-project';
+	const CACHE_FILE_LOCATION_RELATIVELY_TO_ROOT = '/vendor/hash-compare-package/cache/hashes_etalon.txt';
 	
-	/**
-	 * @return array
-	 */
-	public static function hashgen()
-	{
-		//Generates hash sums for folders of carvoy
-
-		$list_to_check = [
+	public static function getconfig(){
+		return [
 			self::ROOT_PATH_RELATIVELY_TO_WORKER . '/public' => [
 				'exclude' => [
 					self::ROOT_PATH_RELATIVELY_TO_WORKER . '/public/images',
 				]
 			],
 		];
+	}
+	
+	/**
+	 * @return array
+	 */
+	public static function hashgen()
+	{
+		//Generates hash sums for folders
+		$list_to_check = self::getconfig();
 		$check_hashes = [];
 		
 		foreach ($list_to_check as $path => $options) {
