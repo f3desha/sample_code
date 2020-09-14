@@ -1,1 +1,1 @@
-# sample_code
+# Code samples by Alexander Kuzmenko
