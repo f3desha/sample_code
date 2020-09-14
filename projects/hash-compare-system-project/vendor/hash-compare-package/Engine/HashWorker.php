@@ -1,5 +1,5 @@
 <?php
-namespace HashCompareSystem\Engine;
+namespace Projects\HashCompareSystem\Engine;
 
 class HashWorker {
 	
