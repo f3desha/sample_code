@@ -3,14 +3,19 @@ namespace HashCompareSystem\Engine;
 
 class HashWorker {
 	
-	const ROOT_PATH_RELATIVELY_TO_WORKER = '../../../hash-compare-system-project';
+	//Folder name of your project
+	const PROJECT_FOLDER_NAME = 'hash-compare-system-project';
 	const CACHE_FILE_LOCATION_RELATIVELY_TO_ROOT = '/vendor/hash-compare-package/cache/hashes_etalon.txt';
+
+	//Dont change
+	const ROOT_PATH_RELATIVELY_TO_WORKER = '../../../';
 	
+	//Setup the config of the folders you want to track
 	public static function getconfig(){
 		return [
-			self::ROOT_PATH_RELATIVELY_TO_WORKER . '/public' => [
+			self::ROOT_PATH_RELATIVELY_TO_WORKER.self::PROJECT_FOLDER_NAME . '/public' => [
 				'exclude' => [
-					self::ROOT_PATH_RELATIVELY_TO_WORKER . '/public/images',
+					self::ROOT_PATH_RELATIVELY_TO_WORKER.self::PROJECT_FOLDER_NAME . '/public/images',
 				]
 			],
 		];
@@ -26,7 +31,7 @@ class HashWorker {
 		$check_hashes = [];
 		
 		foreach ($list_to_check as $path => $options) {
-			$path_exploded = explode(self::ROOT_PATH_RELATIVELY_TO_WORKER, $path);
+			$path_exploded = explode(self::ROOT_PATH_RELATIVELY_TO_WORKER.self::PROJECT_FOLDER_NAME, $path);
 			$path_for_key = $path_exploded[1];
 			if (is_dir($path)) {
 				$check_hashes[$path_for_key] = self::hashDirectory($path, $options);
@@ -103,7 +108,7 @@ class HashWorker {
 					}
 				} else {
 					if (!is_link($directory . '/' . $file)) {
-						$path_exploded = explode(self::ROOT_PATH_RELATIVELY_TO_WORKER, $directory);
+						$path_exploded = explode(self::ROOT_PATH_RELATIVELY_TO_WORKER.self::PROJECT_FOLDER_NAME, $directory);
 						$file_hash[$path_exploded[1] . '/' . $file] = md5_file($directory . '/' . $file);
 					}
 				}
@@ -119,7 +124,7 @@ class HashWorker {
 	 */
 	public function compare()
 	{
-		$hashes_etalon_file = self::ROOT_PATH_RELATIVELY_TO_WORKER . self::CACHE_FILE_LOCATION_RELATIVELY_TO_ROOT;
+		$hashes_etalon_file = self::ROOT_PATH_RELATIVELY_TO_WORKER . self::PROJECT_FOLDER_NAME . self::CACHE_FILE_LOCATION_RELATIVELY_TO_ROOT;
 		$hash_from_file = self::hashread();
 		if (!empty($hash_from_file)) {
 			$hash_array = self::hashgen();
@@ -152,7 +157,7 @@ class HashWorker {
 	 */
 	public static function hashsave(array $hash_array)
 	{
-		$hashes_etalon_file = self::ROOT_PATH_RELATIVELY_TO_WORKER . self::CACHE_FILE_LOCATION_RELATIVELY_TO_ROOT;
+		$hashes_etalon_file = self::ROOT_PATH_RELATIVELY_TO_WORKER . self::PROJECT_FOLDER_NAME . self::CACHE_FILE_LOCATION_RELATIVELY_TO_ROOT;
 		if (file_exists($hashes_etalon_file)) {
 			unlink($hashes_etalon_file);
 		}
@@ -167,7 +172,7 @@ class HashWorker {
 	 */
 	public static function hashread()
 	{
-		$hashes_etalon_file = self::ROOT_PATH_RELATIVELY_TO_WORKER . self::CACHE_FILE_LOCATION_RELATIVELY_TO_ROOT;
+		$hashes_etalon_file = self::ROOT_PATH_RELATIVELY_TO_WORKER . self::PROJECT_FOLDER_NAME . self::CACHE_FILE_LOCATION_RELATIVELY_TO_ROOT;
 		$hashes_etalon = [];
 		if (file_exists($hashes_etalon_file)) {
 			$fn = fopen($hashes_etalon_file, "r");
@@ -230,7 +235,7 @@ class HashWorker {
 	 */
 	public function stop()
 	{
-		$hashes_etalon_file = self::ROOT_PATH_RELATIVELY_TO_WORKER . self::CACHE_FILE_LOCATION_RELATIVELY_TO_ROOT;
+		$hashes_etalon_file = self::ROOT_PATH_RELATIVELY_TO_WORKER . self::PROJECT_FOLDER_NAME . self::CACHE_FILE_LOCATION_RELATIVELY_TO_ROOT;
 		if (file_exists($hashes_etalon_file)) {
 			unlink($hashes_etalon_file);
 			$message = 'Hash tracking stoped.';
