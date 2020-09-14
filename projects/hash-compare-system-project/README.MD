@@ -1,5 +1,6 @@
 Hash Tracking System
 
+1. Make 'composer install'
 1. Setup Config in vendor\hash-compare-package\Engine\HashWorker::getconfig()
 2. Setup the folder name of your project in vendor\hash-compare-package\Engine\HashWorker::PROJECT_FOLDER_NAME
 3. When system is stable run init.php
