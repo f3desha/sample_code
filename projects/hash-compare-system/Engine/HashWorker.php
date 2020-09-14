@@ -2,25 +2,28 @@
 namespace HashCompareSystem\Engine;
 
 class HashWorker {
+	
+	const ROOT_PATH_RELATIVELY_TO_WORKER = '../hash-compare-system';
+	const CACHE_FILE_LOCATION_RELATIVELY_TO_ROOT = '/cache/hashes_etalon.txt';
+	
 	/**
 	 * @return array
 	 */
 	public static function hashgen()
 	{
 		//Generates hash sums for folders of carvoy
-		$root = '../hash-compare-system';
 
 		$list_to_check = [
-			$root . '/public' => [
+			self::ROOT_PATH_RELATIVELY_TO_WORKER . '/public' => [
 				'exclude' => [
-					$root . '/public/excluded',
+					self::ROOT_PATH_RELATIVELY_TO_WORKER . '/public/images',
 				]
 			],
 		];
 		$check_hashes = [];
 		
 		foreach ($list_to_check as $path => $options) {
-			$path_exploded = explode($root, $path);
+			$path_exploded = explode(self::ROOT_PATH_RELATIVELY_TO_WORKER, $path);
 			$path_for_key = $path_exploded[1];
 			if (is_dir($path)) {
 				$check_hashes[$path_for_key] = self::hashDirectory($path, $options);
@@ -73,7 +76,6 @@ class HashWorker {
 	 */
 	public static function hashDirectory($directory, $options)
 	{
-		$root = '../hash-compare-system';
 		if (!is_dir($directory)) {
 			return false;
 		}
@@ -98,7 +100,7 @@ class HashWorker {
 					}
 				} else {
 					if (!is_link($directory . '/' . $file)) {
-						$path_exploded = explode($root, $directory);
+						$path_exploded = explode(self::ROOT_PATH_RELATIVELY_TO_WORKER, $directory);
 						$file_hash[$path_exploded[1] . '/' . $file] = md5_file($directory . '/' . $file);
 					}
 				}
@@ -108,4 +110,133 @@ class HashWorker {
 		$dir->close();
 		return $file_hash;
 	}
+
+	/**
+	 * Makes and compares hashsum of all files with previous generated files hash
+	 */
+	public function compare()
+	{
+		$hashes_etalon_file = self::ROOT_PATH_RELATIVELY_TO_WORKER . self::CACHE_FILE_LOCATION_RELATIVELY_TO_ROOT;
+		$hash_from_file = self::hashread();
+		if (!empty($hash_from_file)) {
+			$hash_array = self::hashgen();
+			$result = self::hashcompare($hash_from_file, $hash_array);
+			if (empty($result)) {
+				$message = "Hash integrity is stable compare to etalon created at: " . date("F d Y H:i:s.", filemtime($hashes_etalon_file));
+				echo "$message\n";
+				return 0;
+			}
+			$mail_output_files = "";
+			foreach ($result as $group_name => $group) {
+				$out = strtoupper('[' . $group_name . ']') . "\n";
+				$out .= implode("\n", $group);
+				$out .= "\n\n";
+				$mail_output_files .= $out;
+				$message = $out;
+				echo "$message";
+			}
+			
+			return 0;
+		} else {
+			$message = 'No hash found. Please init hash tracking with init command.';
+			echo "$message\n";
+			return 1;
+		}
+	}
+
+	/**
+	 * @param array $hash_array
+	 */
+	public static function hashsave(array $hash_array)
+	{
+		$hashes_etalon_file = self::ROOT_PATH_RELATIVELY_TO_WORKER . self::CACHE_FILE_LOCATION_RELATIVELY_TO_ROOT;
+		if (file_exists($hashes_etalon_file)) {
+			unlink($hashes_etalon_file);
+		}
+		foreach ($hash_array as $k => $hash) {
+			$line = $k . '|' . $hash . "\n";
+			file_put_contents($hashes_etalon_file, $line, FILE_APPEND | LOCK_EX);
+		}
+	}
+
+	/**
+	 * @return array
+	 */
+	public static function hashread()
+	{
+		$hashes_etalon_file = self::ROOT_PATH_RELATIVELY_TO_WORKER . self::CACHE_FILE_LOCATION_RELATIVELY_TO_ROOT;
+		$hashes_etalon = [];
+		if (file_exists($hashes_etalon_file)) {
+			$fn = fopen($hashes_etalon_file, "r");
+			while (!feof($fn)) {
+				$result = fgets($fn);
+				if ($result) {
+					$e = explode('|', $result);
+					$hashes_etalon[$e[0]] = substr($e[1], 0, -1);
+				}
+			}
+			fclose($fn);
+		}
+		return $hashes_etalon;
+	}
+
+	/**
+	 * @param array $etalon_hashes
+	 * @param array $new_hash
+	 * @return array
+	 */
+	public static function hashcompare(array $etalon_hashes, array $new_hash)
+	{
+		$hash_differences = [];
+		foreach ($etalon_hashes as $etalon_key => $etalon_hash) {
+			if (array_key_exists($etalon_key, $new_hash) && array_key_exists($etalon_key, $etalon_hashes)) {
+				if ($new_hash[$etalon_key] !== $etalon_hashes[$etalon_key]) {
+					$hash_differences['modified'][] = $etalon_key;
+				}
+			}
+		}
+
+		foreach ($new_hash as $key => $hash) {
+			if (!array_key_exists($key, $etalon_hashes)) {
+				$hash_differences['new'][] = $key;
+			}
+		}
+
+		foreach ($etalon_hashes as $key => $hash) {
+			if (!array_key_exists($key, $new_hash)) {
+				$hash_differences['deleted'][] = $key;
+			}
+		}
+		return $hash_differences;
+	}
+
+	/**
+	 * Makes and saves a hashsum of all files to compare in future
+	 */
+	public function init()
+	{
+		$hash_array = self::hashgen();
+		self::hashsave($hash_array);
+		$message = 'Hash generated successfully.';
+		echo "$message\n";
+		return 0;
+	}
+
+	/**
+	 * Deletes hashsum of all files with previous generated files hash and stops tracking while new hash will not be created
+	 */
+	public function stop()
+	{
+		$hashes_etalon_file = self::ROOT_PATH_RELATIVELY_TO_WORKER . self::CACHE_FILE_LOCATION_RELATIVELY_TO_ROOT;
+		if (file_exists($hashes_etalon_file)) {
+			unlink($hashes_etalon_file);
+			$message = 'Hash tracking stoped.';
+			echo "$message\n";
+			return 0;
+		}
+		$message = 'Nothing to stop.';
+		echo "$message\n";
+		return 1;
+	}
+	
 }

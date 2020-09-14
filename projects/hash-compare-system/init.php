@@ -3,4 +3,5 @@ require '../../vendor/autoload.php';
 
 use HashCompareSystem\Engine\HashWorker;
 
-$hashes = HashWorker::hashgen();
+$class = new HashWorker();
+$class->init();
