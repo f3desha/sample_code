@@ -1,7 +1,7 @@
 <?php
-require '../../../../vendor/autoload.php';
+require '../autoload.php';
 
-use Projects\HashCompareSystem\Engine\HashWorker;
+use HashCompare\Engine\HashWorker;
 
 $class = new HashWorker();
 $class->init();

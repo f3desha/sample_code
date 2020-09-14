@@ -10,7 +10,7 @@
     "require": {},
     "autoload": {
       "psr-4": {
-        "Projects\\": "projects"
+        "HashCompare\\": "vendor/hash-compare-package"
       }
     }
 }
