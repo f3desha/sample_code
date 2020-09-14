@@ -6,3 +6,4 @@ Hash Tracking System
 4. Create, modify or delete any file in /public folder
 5. Check system stability running check.php
 6. When you want to make new hash, run stop.php and then init.php
+7. Enjoy
