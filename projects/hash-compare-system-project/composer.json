@@ -7,10 +7,8 @@
             "email": "f3dstudiya@gmail.com"
         }
     ],
-    "require": {},
-    "autoload": {
-      "psr-4": {
-        "HashCompare\\": "vendor/hash-compare-package"
-      }
+    "minimum-stability": "dev",
+    "require": {
+        "f3desha/hash-compare-package": "dev-master"
     }
 }
