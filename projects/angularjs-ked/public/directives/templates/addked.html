@@ -1,0 +1,25 @@
+<div class="box box-success">
+	<div class="box-header with-border">
+		<h3 class="box-title">Different Width</h3>
+	</div>
+	<div class="box-body">
+		<div class="row">
+			<div class="col-xs-2">
+				<input ng-model="newKed.name" type="text" class="form-control" placeholder="Name of Ked">
+			</div>
+			<div class="col-xs-2">
+				<input ng-model="newKed.grow_start" view="minutes" format="yyyy-MM-dd HH:mm:ss" date-time type="text" class="form-control" placeholder="Grow started">
+			</div>
+			<div class="col-xs-2">
+				<input ng-model="newKed.grow_end" view="minutes" format="yyyy-MM-dd HH:mm:ss" date-time type="text" class="form-control" placeholder="Grow finished">
+			</div>
+			<div class="col-xs-2">
+				<input ng-model="newKed.fall_end" view="minutes" format="yyyy-MM-dd HH:mm:ss" date-time type="text" class="form-control" placeholder="Fall finished">
+			</div>
+			<div class="col-xs-2">
+				<button ng-click="addKed()" class="btn btn-primary">Add new Ked</button>
+			</div>
+		</div>
+	</div>
+	<!-- /.box-body -->
+</div>
