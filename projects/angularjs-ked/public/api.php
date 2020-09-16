@@ -1,8 +1,6 @@
 <?php
 require "../private/autoload.php";
 
-use api\models\Db;
-
 function getKedLength(string $start_time, string $end_time){
 	$length_in_seconds = strtotime($end_time) - strtotime($start_time);
 	$length_in_minutes = (int)($length_in_seconds / 60);
